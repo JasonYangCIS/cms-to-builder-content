@@ -53,18 +53,11 @@ tell it how.
 | Deterministic engine | `scripts/*.py` | Export, transform, write, verify, reconcile, report: the work that must not be improvised |
 
 ```mermaid
-flowchart TB
-  You(["You"]) --> CC
-  subgraph CC["Claude Code, running in this folder"]
-    CM["CLAUDE.md<br/>rules and the batch loop"]
-    SK["Skills<br/>/setup-migration /map-content-model /run-migration<br/>/migration-report /triage-needs-human"]
-    AG["Subagents<br/>migrator, verifier, reporter"]
-    GD["Permissions and guard hook<br/>read-only Contentful, draft-only Builder"]
-  end
-  CC --> MCP["MCP servers<br/>Contentful (read), Builder.io"]
-  CC --> PY["scripts/*.py<br/>deterministic engine"]
-  PY --> MF[("Manifest<br/>state/manifest.db")]
-  PY --> BD[("Builder.io<br/>drafts only")]
+flowchart LR
+  You(["You"]) --> CC["Claude Code<br/>(CLAUDE.md, skills, subagents, guard)"]
+  CC --> SRC[("Contentful<br/>read only")]
+  CC --> PY["Scripts<br/>(do the bulk work)"]
+  PY --> BLD[("Builder.io<br/>drafts only")]
 ```
 
 The **main Claude Code session is the orchestrator** (subagents cannot spawn subagents): it reads `CLAUDE.md`, claims
@@ -75,14 +68,10 @@ of that procedure.
 
 ```mermaid
 flowchart LR
-  CF[("Contentful<br/>read-only")] -->|"export"| EX["exports/"]
-  EX --> MAP{{"Mapping<br/>approved by you"}}
-  MAP --> MK["Maker<br/>migrator agent or run_migration.py"]
-  MN[("Manifest")] <-->|"claim and set"| MK
-  MK -->|"drafts only"| BD[("Builder.io")]
-  BD --> CK["Checker<br/>verifier agent or run_verification.py"]
-  CK --> MN
-  MN --> RP["Reports<br/>reconcile, SEO and redirects, HTML site"]
+  A["1. Export<br/>from Contentful"] --> B{"2. You approve<br/>the mapping"}
+  B --> C["3. Migrate<br/>drafts in Builder"]
+  C --> D["4. Verify<br/>re-read and compare"]
+  D --> E["5. Report"]
 ```
 
 Two ways to run the same roles:
@@ -101,26 +90,14 @@ scripts flag (`needs_human`, fuzzy items).
 ```mermaid
 sequenceDiagram
   actor You
-  participant O as Claude Code (orchestrator)
-  participant M as Maker
-  participant DB as Manifest
+  participant CC as Claude Code
   participant B as Builder.io
-  participant C as Checker
-  You->>O: /run-migration page
-  O->>O: mapping.py check (is the mapping approved?)
-  O->>DB: claim a batch of pending rows
-  O->>M: rows with DRY_RUN
-  M-->>O: what it would write (no writes)
-  O->>You: show the dry-run diff and ask to apply
-  You->>O: approve
-  O->>M: same rows, for real
-  M->>B: create drafts (published draft only)
-  M->>DB: set migrated (compare-and-set on the claim)
-  O->>DB: claim migrated rows
-  O->>C: rows to verify
-  C->>B: re-read each draft
-  C->>DB: set verified or failed
-  O->>You: summary, then STOP for your review
+  You->>CC: /run-migration page
+  CC->>You: dry run: here is what I would write
+  You->>CC: approve
+  CC->>B: create drafts
+  CC->>B: re-read each draft and check it
+  CC->>You: summary, then STOP for your review
 ```
 
 ### Status lifecycle
@@ -128,18 +105,13 @@ sequenceDiagram
 ```mermaid
 stateDiagram-v2
   [*] --> pending
-  pending --> in_progress: claim
-  in_progress --> migrated: maker wrote a draft
-  migrated --> in_progress: claim for checking
-  in_progress --> verified: all checks pass
-  in_progress --> failed: a check failed
-  failed --> in_progress: retry
-  failed --> needs_human: 4th failure
-  in_progress --> needs_human: exception or unknown outcome
-  needs_human --> pending: requeue
-  pending --> skipped: skip with a reason
+  pending --> migrated: draft written
+  migrated --> verified: all checks pass
+  migrated --> failed: a check failed
+  failed --> pending: retry
+  failed --> needs_human: failed 4 times
+  needs_human --> pending: requeue after a fix
   needs_human --> skipped: skip with a reason
-  skipped --> pending: requeue
   verified --> [*]
 ```
 
@@ -332,19 +304,14 @@ walks you through this loop. The report's **Needs attention** page groups entrie
 
 ```mermaid
 flowchart TD
-  A["Report: Needs attention groups"] --> B["Open the biggest group<br/>read the samples and its CSV"]
-  B --> C["Reproduce one sample<br/>run_migration.py --preview ID"]
-  C --> D{"What is the cause?"}
-  D -->|"Policy, mapping or transformer"| E["Fix the cause once"]
-  D -->|"Bad source content"| F["Content team fixes Contentful<br/>then re-export"]
-  D -->|"Out of scope"| G["manifest.py skip with a reason"]
-  E --> H["manifest.py requeue<br/>dry run, then apply"]
-  F --> H
-  H --> I["Re-run a small wave and re-verify"]
-  I --> J{"Clean?"}
-  J -->|"Yes"| K["Widen the wave"]
-  J -->|"No"| B
-  G --> L["Entries leave the work queue"]
+  A["Open the biggest group<br/>in the report"] --> B["Find the cause"]
+  B --> C["Fix it once<br/>(mapping, code or source content)"]
+  C --> D["Requeue the group"]
+  D --> E["Re-run a small wave"]
+  E --> F{"Clean?"}
+  F -->|"Yes"| G["Widen the wave"]
+  F -->|"No"| A
+  B -.->|"out of scope"| H["Skip with a reason"]
 ```
 
 1. **Reproduce a sample:** `python3 scripts/run_migration.py --preview <source_id>`.

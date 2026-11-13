@@ -4,13 +4,12 @@ Run order for a real migration:
 
 ```mermaid
 flowchart LR
-  P0["Export<br/>export_contentful.py"] --> P1["1. Mapping proposal<br/>propose_mapping.py"]
-  P1 --> AP{"You approve<br/>the mapping"}
-  AP --> P2["2. Assets<br/>migrate_assets.py"]
-  P2 --> CORE["Core pipeline<br/>maker then checker"]
-  CORE --> P3["3. References<br/>reconcile.py"]
-  P3 --> P4["4. Redirects and SEO<br/>seo_redirect_check.py"]
-  P4 --> RP["Report site<br/>build_report_html.py"]
+  A["Export"] --> B{"Approve<br/>mapping"}
+  B --> C["Assets"]
+  C --> D["Migrate<br/>and verify"]
+  D --> E["References"]
+  E --> F["Redirects<br/>and SEO"]
+  F --> G["Report"]
 ```
 
 All phases are implemented as scripts
