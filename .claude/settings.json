@@ -1,0 +1,108 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 scripts/manifest.py:*)",
+      "Bash(python3 scripts/verify_checks.py:*)",
+      "Bash(python3 scripts/mapping.py check)",
+      "Bash(python3 scripts/mapping.py status)",
+      "Bash(python3 scripts/guard.py --selftest)",
+      "mcp__contentful__get_initial_context",
+      "mcp__contentful__get_entry",
+      "mcp__contentful__get_asset",
+      "mcp__contentful__get_content_type",
+      "mcp__contentful__get_locale",
+      "mcp__contentful__list_content_types",
+      "mcp__contentful__list_locales",
+      "mcp__contentful__list_assets",
+      "mcp__contentful__list_spaces",
+      "mcp__contentful__list_environments",
+      "mcp__contentful__search_entries",
+      "mcp__contentful__resolve_entry_references",
+      "mcp__claude_ai_Builder_io_Publish__who_am_i",
+      "mcp__claude_ai_Builder_io_Publish__list_builder_models",
+      "mcp__claude_ai_Builder_io_Publish__get_model_schema",
+      "mcp__claude_ai_Builder_io_Publish__get_content",
+      "mcp__claude_ai_Builder_io_Publish__browse_model_content",
+      "mcp__claude_ai_Builder_io_Publish__get_registered_components",
+      "mcp__claude_ai_Builder_io_Publish__search_assets"
+    ],
+    "ask": [
+      "mcp__claude_ai_Builder_io_Publish__create_builder_content",
+      "mcp__claude_ai_Builder_io_Publish__update_content",
+      "mcp__claude_ai_Builder_io_Publish__create_builder_model",
+      "mcp__claude_ai_Builder_io_Publish__update_builder_model",
+      "mcp__claude_ai_Builder_io_Publish__create_symbol",
+      "mcp__claude_ai_Builder_io_Publish__write_content_source",
+      "mcp__claude_ai_Builder_io_Publish__edit_content_source",
+      "Bash(python3 scripts/mapping.py approve)",
+      "Bash(python3 scripts/manifest.py requeue:*)",
+      "Bash(python3 scripts/manifest.py skip:*)"
+    ],
+    "deny": [
+      "mcp__contentful__append_entry_field",
+      "mcp__contentful__archive_asset",
+      "mcp__contentful__archive_entry",
+      "mcp__contentful__cancel_scheduled_release",
+      "mcp__contentful__create_concept",
+      "mcp__contentful__create_concept_scheme",
+      "mcp__contentful__create_content_type",
+      "mcp__contentful__create_entry",
+      "mcp__contentful__create_environment",
+      "mcp__contentful__create_release",
+      "mcp__contentful__create_tag",
+      "mcp__contentful__create_upload_session",
+      "mcp__contentful__delete_asset",
+      "mcp__contentful__delete_concept",
+      "mcp__contentful__delete_concept_scheme",
+      "mcp__contentful__delete_content_type",
+      "mcp__contentful__delete_content_type_field",
+      "mcp__contentful__delete_entry",
+      "mcp__contentful__delete_environment",
+      "mcp__contentful__disable_content_type_field",
+      "mcp__contentful__invoke_ai_action",
+      "mcp__contentful__omit_content_type_field",
+      "mcp__contentful__patch_entry",
+      "mcp__contentful__publish_asset",
+      "mcp__contentful__publish_content_type",
+      "mcp__contentful__publish_entry",
+      "mcp__contentful__publish_release",
+      "mcp__contentful__schedule_publish_release",
+      "mcp__contentful__schedule_unpublish_release",
+      "mcp__contentful__unarchive_asset",
+      "mcp__contentful__unarchive_entry",
+      "mcp__contentful__unpublish_asset",
+      "mcp__contentful__unpublish_content_type",
+      "mcp__contentful__unpublish_entry",
+      "mcp__contentful__unpublish_release",
+      "mcp__contentful__update_asset",
+      "mcp__contentful__update_concept",
+      "mcp__contentful__update_concept_scheme",
+      "mcp__contentful__update_content_type",
+      "mcp__contentful__update_editor_interface",
+      "mcp__contentful__update_entry",
+      "mcp__contentful__update_release",
+      "mcp__contentful__upload_asset",
+      "mcp__claude_ai_Builder_io_Publish__publish_builder_content",
+      "mcp__claude_ai_Builder_io_Publish__delete_content",
+      "mcp__claude_ai_Builder_io_Publish__delete_builder_content",
+      "mcp__claude_ai_Builder_io_Publish__delete_builder_model",
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Bash(rm -rf:*)",
+      "Bash(sqlite3:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

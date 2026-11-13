@@ -1,0 +1,227 @@
+{
+  "_comment": "EXAMPLE mapping. Copy to mapping/field-mapping.json (git-ignored), replace every YOUR_* placeholder, adapt the content types to your space, review it, then approve it yourself: python3 scripts/mapping.py approve",
+  "approved": false,
+  "version": 3,
+  "source": {
+    "space": "YOUR_CONTENTFUL_SPACE_ID",
+    "environment": "master",
+    "locale": "en-US"
+  },
+  "target": {
+    "space": "YOUR_BUILDER_SPACE_ID",
+    "state": "draft"
+  },
+  "placeholders": {
+    "index": "position of the component in the parent page's componentsReference (0-based) = Builder data.blocks index",
+    "item": "position of a FAQ item in componentFaq.items (0-based)"
+  },
+  "content_types": {
+    "page": {
+      "target_model": "page",
+      "target_name_by_entry": {
+        "YOUR_HOME_ENTRY_ID": "Home (migrated draft)"
+      },
+      "target_name_from": "title",
+      "fields": [
+        {
+          "source": "title",
+          "target": "data.title",
+          "type": "text"
+        },
+        {
+          "source": "slug",
+          "target": "data.url",
+          "type": "slug",
+          "constant_map": {
+            "/": "/home-migrated"
+          },
+          "note": "Source slug '/' would collide with an existing live Builder page, so only that slug is rewritten; every other slug is kept as-is"
+        },
+        {
+          "source": "componentsReference",
+          "target": "data.blocks",
+          "type": "inline",
+          "note": "Referenced entries are inlined as blocks in order; each is checked via its own content type below with --var index=<position>"
+        }
+      ]
+    },
+    "componentHero": {
+      "target_model": "page",
+      "inline_into": "page",
+      "target_component": "HeroCentered",
+      "block_path": "data.blocks.{index}",
+      "note": "headingLevel is intentionally not set (component default h1).",
+      "fields": [
+        {
+          "source": "header",
+          "target": "data.blocks.{index}.component.options.heading",
+          "type": "text"
+        },
+        {
+          "source": "body",
+          "target": "data.blocks.{index}.component.options.body",
+          "type": "text"
+        },
+        {
+          "source": "buttonLabel",
+          "target": "data.blocks.{index}.component.options.ctaLabel",
+          "type": "text"
+        },
+        {
+          "source": "buttonLink",
+          "target": "data.blocks.{index}.component.options.ctaHref",
+          "type": "text"
+        },
+        {
+          "source": "preheader",
+          "type": "dropped",
+          "reason": "HeroCentered has no eyebrow/preheader input (decision: drop for the pilot)"
+        },
+        {
+          "source": "backgroundImage",
+          "type": "dropped",
+          "reason": "HeroCentered has no image input (decision: drop for the pilot; asset phase revisits)"
+        }
+      ]
+    },
+    "componentHeroSplit": {
+      "target_model": "page",
+      "inline_into": "page",
+      "target_component": "HeroSplit",
+      "block_path": "data.blocks.{index}",
+      "fields": [
+        {
+          "source": "eyebrow",
+          "target": "data.blocks.{index}.component.options.eyebrow",
+          "type": "text"
+        },
+        {
+          "source": "heading",
+          "target": "data.blocks.{index}.component.options.heading",
+          "type": "text"
+        },
+        {
+          "source": "headingAccent",
+          "target": "data.blocks.{index}.component.options.headingAccent",
+          "type": "text"
+        },
+        {
+          "source": "body",
+          "target": "data.blocks.{index}.component.options.body",
+          "type": "text"
+        },
+        {
+          "source": "ctaLabel",
+          "target": "data.blocks.{index}.component.options.ctaLabel",
+          "type": "text"
+        },
+        {
+          "source": "ctaHref",
+          "target": "data.blocks.{index}.component.options.ctaHref",
+          "type": "text"
+        },
+        {
+          "source": "secondaryCtaLabel",
+          "target": "data.blocks.{index}.component.options.secondaryCtaLabel",
+          "type": "text"
+        },
+        {
+          "source": "secondaryCtaHref",
+          "target": "data.blocks.{index}.component.options.secondaryCtaHref",
+          "type": "text"
+        },
+        {
+          "source": "imageAlt",
+          "target": "data.blocks.{index}.component.options.imageAlt",
+          "type": "text"
+        },
+        {
+          "source": "headingLevel",
+          "target": "data.blocks.{index}.component.options.headingLevel",
+          "type": "text"
+        },
+        {
+          "source": "imagePosition",
+          "target": "data.blocks.{index}.component.options.imagePosition",
+          "type": "text"
+        },
+        {
+          "source": "frameLabel",
+          "target": "data.blocks.{index}.component.options.frameLabel",
+          "type": "text"
+        },
+        {
+          "source": "frameFootLeft",
+          "target": "data.blocks.{index}.component.options.frameFootLeft",
+          "type": "text"
+        },
+        {
+          "source": "frameFootRight",
+          "target": "data.blocks.{index}.component.options.frameFootRight",
+          "type": "text"
+        },
+        {
+          "source": "image",
+          "type": "dropped",
+          "reason": "HeroSplit.imageUrl needs a hosted file; skipped until the asset phase"
+        }
+      ]
+    },
+    "componentFaq": {
+      "target_model": "page",
+      "inline_into": "page",
+      "target_component": "FaqList",
+      "block_path": "data.blocks.{index}",
+      "fields": [
+        {
+          "source": "heading",
+          "target": "data.blocks.{index}.component.options.heading",
+          "type": "text"
+        },
+        {
+          "source": "items",
+          "target": "data.blocks.{index}.component.options.items",
+          "type": "inline",
+          "note": "componentFaqItem entries are inlined as options.items[{question, answerHtml}] in order; each is checked via componentFaqItem with --var index=<n> --var item=<m>"
+        }
+      ]
+    },
+    "componentFaqItem": {
+      "target_model": "page",
+      "inline_into": "componentFaq",
+      "fields": [
+        {
+          "source": "question",
+          "target": "data.blocks.{index}.component.options.items.{item}.question",
+          "type": "text"
+        },
+        {
+          "source": "answer",
+          "target": "data.blocks.{index}.component.options.items.{item}.answerHtml",
+          "type": "richtext",
+          "note": "Contentful RichText -> HTML; richtext comparator is a stub, so the verifier judges (fuzzy)"
+        }
+      ]
+    },
+    "componentProductGridSelected": {
+      "target_model": "page",
+      "inline_into": "page",
+      "target_component": "ProductGridSelected",
+      "block_path": "data.blocks.{index}",
+      "fields": [
+        {
+          "source": "heading",
+          "target": "data.blocks.{index}.component.options.heading",
+          "type": "text"
+        },
+        {
+          "source": "handles",
+          "target": "data.blocks.{index}.component.options.handles",
+          "type": "handle_list",
+          "item_key": "shopifyProductHandle",
+          "note": "Source list of strings becomes options.handles = [{shopifyProductHandle: <handle>}, ...]"
+        }
+      ]
+    }
+  }
+}

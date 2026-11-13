@@ -1,0 +1,99 @@
+{
+  "_comment": "Seed definitions for Contentful. Content types mirror Builder SDK component inputs (get_registered_components). Entries are created as DRAFTS (never published). Image/asset fields are intentionally left empty (asset phase).",
+  "locale": "en-US",
+  "content_types": [
+    {
+      "id": "componentFaqItem",
+      "name": "Component: FAQ Item",
+      "displayField": "question",
+      "fields": [
+        {"id": "question", "name": "Question", "type": "Symbol", "required": true, "localized": true},
+        {"id": "answer", "name": "Answer", "type": "RichText", "required": true, "localized": true}
+      ]
+    },
+    {
+      "id": "componentFaq",
+      "name": "Component: FAQ List",
+      "displayField": "heading",
+      "fields": [
+        {"id": "heading", "name": "Heading", "type": "Symbol", "localized": true},
+        {"id": "items", "name": "Items", "type": "Array", "required": true,
+         "items": {"type": "Link", "linkType": "Entry", "validations": [{"linkContentType": ["componentFaqItem"]}]}}
+      ]
+    },
+    {
+      "id": "componentHeroSplit",
+      "name": "Component: Hero Split",
+      "displayField": "heading",
+      "fields": [
+        {"id": "eyebrow", "name": "Eyebrow", "type": "Symbol", "localized": true},
+        {"id": "heading", "name": "Heading", "type": "Symbol", "required": true, "localized": true},
+        {"id": "headingAccent", "name": "Heading Accent", "type": "Symbol", "localized": true},
+        {"id": "body", "name": "Body", "type": "Text", "localized": true},
+        {"id": "ctaLabel", "name": "CTA Label", "type": "Symbol", "localized": true},
+        {"id": "ctaHref", "name": "CTA Href", "type": "Symbol", "localized": true},
+        {"id": "secondaryCtaLabel", "name": "Secondary CTA Label", "type": "Symbol", "localized": true},
+        {"id": "secondaryCtaHref", "name": "Secondary CTA Href", "type": "Symbol", "localized": true},
+        {"id": "image", "name": "Image", "type": "Link", "linkType": "Asset"},
+        {"id": "imageAlt", "name": "Image Alt", "type": "Symbol", "localized": true},
+        {"id": "headingLevel", "name": "Heading Level", "type": "Symbol", "validations": [{"in": ["h1", "h2"]}]},
+        {"id": "imagePosition", "name": "Image Position", "type": "Symbol", "validations": [{"in": ["left", "right"]}]},
+        {"id": "frameLabel", "name": "Frame Label", "type": "Symbol", "localized": true},
+        {"id": "frameFootLeft", "name": "Frame Foot Left", "type": "Symbol", "localized": true},
+        {"id": "frameFootRight", "name": "Frame Foot Right", "type": "Symbol", "localized": true}
+      ]
+    },
+    {
+      "id": "componentProductGridSelected",
+      "name": "Component: Product Grid (Selected)",
+      "displayField": "heading",
+      "fields": [
+        {"id": "heading", "name": "Heading", "type": "Symbol", "localized": true},
+        {"id": "handles", "name": "Shopify Product Handles", "type": "Array", "required": true,
+         "items": {"type": "Symbol"}}
+      ]
+    }
+  ],
+  "entries": [
+    {"id": "seed-hero-field-report", "content_type": "componentHero", "fields": {
+      "preheader": "SEED / FIELD REPORT 014",
+      "header": "Seed Hero: Field Report",
+      "body": "A second HeroCentered-shaped hero for pilot coverage.",
+      "buttonLabel": "Read the report",
+      "buttonLink": "https://example.com/design-system"}},
+    {"id": "seed-hero-split", "content_type": "componentHeroSplit", "fields": {
+      "eyebrow": "SEED / HERO SPLIT",
+      "heading": "Built for the long haul",
+      "headingAccent": "long haul",
+      "body": "Split hero with primary and secondary calls to action.",
+      "ctaLabel": "Shop now",
+      "ctaHref": "https://example.com/",
+      "secondaryCtaLabel": "Learn more",
+      "secondaryCtaHref": "https://example.com/design-system",
+      "imageAlt": "Placeholder (image omitted until asset phase)",
+      "headingLevel": "h2",
+      "imagePosition": "right",
+      "frameLabel": "FIELD REPORT 014",
+      "frameFootLeft": "LAT 47.6 N",
+      "frameFootRight": "LON 122.3 W"}},
+    {"id": "seed-faq-item-1", "content_type": "componentFaqItem", "fields": {
+      "question": "How long does shipping take?",
+      "answer": "Orders ship within two business days."}},
+    {"id": "seed-faq-item-2", "content_type": "componentFaqItem", "fields": {
+      "question": "Can I return an item?",
+      "answer": "Yes, returns are accepted within 30 days."}},
+    {"id": "seed-faq-item-3", "content_type": "componentFaqItem", "fields": {
+      "question": "Do you ship internationally?",
+      "answer": "We ship to most countries; rates vary by region."}},
+    {"id": "seed-faq", "content_type": "componentFaq", "fields": {
+      "heading": "Frequently asked questions",
+      "items": ["seed-faq-item-1", "seed-faq-item-2", "seed-faq-item-3"]}},
+    {"id": "seed-product-grid", "content_type": "componentProductGridSelected", "fields": {
+      "heading": "Featured products",
+      "handles": ["example-product-one", "example-product-two"]}},
+    {"id": "seed-page-landing", "content_type": "page", "fields": {
+      "title": "Seed Landing",
+      "slug": "/seed-landing",
+      "componentsReference": ["seed-hero-field-report", "seed-hero-split", "seed-product-grid", "seed-faq"]}}
+  ]
+}

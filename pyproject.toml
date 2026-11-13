@@ -1,0 +1,25 @@
+# Developer tooling only: the pipeline itself needs nothing but the Python standard library (3.9+).
+# Install the checks with `make dev-setup`, run them with `make check`.
+
+[tool.ruff]
+target-version = "py39"        # the minimum Python we support; ruff also flags newer-only syntax
+line-length = 160
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]   # import/statement errors, pyflakes, bugbear
+ignore = [
+    "E702",  # compact `a; b` one-liners are used deliberately in CLI/parser setup
+    "E731",  # tiny lambda helpers (e.g. `arg = lambda ...`) are used deliberately
+    "B905",  # zip(strict=...) needs Python 3.10; we support 3.9
+]
+
+[tool.mypy]
+python_version = "3.9"
+files = ["scripts"]
+mypy_path = "scripts:scripts/transform"
+namespace_packages = false     # `mapping/` (data) must not shadow scripts/mapping.py
+check_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
